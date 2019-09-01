@@ -10,10 +10,10 @@ import java.util.stream.Collectors;
 public class Agenda {
 
     private final Scanner menu = new Scanner(System.in);
-    private final Scanner search = new Scanner(System.in);
     private final Scanner data = new Scanner(System.in);
+    private final Scanner newValue = new Scanner(System.in);
 
-    private final List<Person> people = new ArrayList<>();
+    private final List<Person> peopleList = new ArrayList<>();
 
     public void run() {
         printMenu();
@@ -34,11 +34,11 @@ public class Agenda {
                 } else if (option == 3) {
                     deleteEntry();
                 } else if (option == 4) {
-                    showEntries(people);
+                    showEntries(peopleList);
                 } else if (option == 5) {
                     searchEntry();
                 } else {
-                    System.out.println("The option is not valid");
+                    System.out.println("The option does not exist");
                 }
 
             } catch (Exception ex) {
@@ -50,7 +50,7 @@ public class Agenda {
     }
 
     private void printMenu() {
-        System.out.println("Please select an option");
+        System.out.println("\nPlease select an option");
         System.out.println("0. Exit");
         System.out.println("1. Create entry");
         System.out.println("2. Update entry");
@@ -72,28 +72,99 @@ public class Agenda {
         System.out.print("+  Phone: ");
         String phone = readString();
 
-        people.add(new Person(name, surname, phone));
+        peopleList.add(new Person(name, surname, phone));
+        System.out.println("Entry added");
     }
 
     private void updateEntry() {
-        System.out.println("-- Update an Entry");
+        if (listEmpty()) {
+        } else {
+            System.out.println("-- Update an Entry\nWhat entry number do you want to update?");
+            try {
+                int entry = Integer.valueOf(menu.next());
+
+                if ((peopleList.size() - 1) >= entry) {
+                    System.out.println("What do you want to update?");
+                    System.out.println("1. Name");
+                    System.out.println("2. Surname");
+                    System.out.println("3. Phone");
+                    String option = menu.next();
+                    if((Integer.valueOf(option)<1)||(Integer.valueOf(option)>3)){
+                        System.out.println("The option does not exist");
+                    }
+                    else{
+                    System.out.println("Enter the new value");
+                    String value = newValue.next();
+
+                        if (option.equals("1")) {
+                            Person updatedPerson = peopleList.get(entry);
+                            peopleList.remove(entry);
+                            updatedPerson.setName(value);
+                            peopleList.add(entry, updatedPerson);
+                            System.out.println("Name updated");
+                        } else if (option.equals("2")) {
+                            Person updatedPerson = peopleList.get(entry);
+                            peopleList.remove(entry);
+                            updatedPerson.setSurname(value);
+                            peopleList.add(entry, updatedPerson);
+                            System.out.println("Surname updated");
+                        } else if (option.equals("3")) {
+                            Person updatedPerson = peopleList.get(entry);
+                            peopleList.remove(entry);
+                            updatedPerson.setPhone(value);
+                            peopleList.add(entry, updatedPerson);
+                            System.out.println("Phone updated");
+                        }
+                    }
+                } else System.out.println("The entry does not exist");
+            }
+            catch (Exception ex) {
+                System.out.println("The option is not a number");
+            }
+        }
     }
 
     private void deleteEntry() {
-        System.out.println("-- Delete an Entry");
+        if(listEmpty()){}
+
+        else {
+            System.out.println("-- Delete an Entry\nWhat entry number do you want to delete?");
+            try
+            {
+                int entry = Integer.valueOf(menu.next());
+                if((peopleList.size()-1)>=entry)
+                {
+                    System.out.println("Are you sure?\nPress Y to confirm, any other key to cancel");
+                    if (newValue.next().equals("Y"))
+                    {
+                        peopleList.remove(entry);
+                        System.out.println("Entry deleted");
+                    }
+                    else {}
+                }
+                else System.out.println("The entry does not exist");
+            }
+            catch (Exception ex){
+                System.out.println("The option is not a number");
+
+            }
+        }
     }
 
     private void showEntries(List<Person> list) {
         System.out.println("-- Show Entries");
+        if(listEmpty()){}
 
-        list.forEach(person -> {
-            System.out.println("- Entry " + people.indexOf(person));
-            System.out.println("- Name:" + person.getName());
-            System.out.println("- Surname:" + person.getSurname());
-            System.out.println("- Phone:" + person.getPhone());
-            System.out.println();
-        });
+        else {
 
+            list.forEach(person -> {
+                System.out.println("- Entry " + peopleList.indexOf(person));
+                System.out.println("- Name: " + person.getName());
+                System.out.println("- Surname: " + person.getSurname());
+                System.out.println("- Phone: " + person.getPhone());
+                System.out.println();
+            });
+        }
         /*
         for (Person person : people) {
             System.out.println("- Entry " + people.indexOf(person));
@@ -106,6 +177,9 @@ public class Agenda {
     }
 
     private void searchEntry() {
+        if(listEmpty()){}
+
+        else {
         System.out.println("-- Search Entry");
         System.out.println("1. By name");
         System.out.println("2. By surname");
@@ -118,30 +192,61 @@ public class Agenda {
                 searchByName();
 
             } else if (option == 2) {
-                // searchBySurname();
+                searchBySurname();
 
             } else if (option == 3) {
-                // searchByPhone();
+                searchByPhone();
             } else {
-                System.out.println("The option is not valid");
+                System.out.println("The option does not exist");
             }
 
-        } catch (Exception ex) {
-            System.out.println("The option is not a number");
+            } catch (Exception ex) {
+                System.out.println("The option is not a number");
+            }
         }
     }
 
     private void searchByName() {
         System.out.print("==> ");
         String name = readString();
-        List<Person> search = people.stream()
+        List<Person> searchList = peopleList.stream()
                 .filter(person -> person.getName().startsWith(name))
                 .collect(Collectors.toList());
-        showEntries(search);
+        showEntries(searchList);
+    }
+
+    private void searchBySurname() {
+        System.out.print("==> ");
+        String surname = readString();
+        List<Person> searchList = peopleList.stream()
+                .filter(person -> person.getSurname().startsWith(surname))
+                .collect(Collectors.toList());
+        showEntries(searchList);
+    }
+
+    private void searchByPhone() {
+        System.out.print("==> ");
+        String phone = readString();
+        List<Person> searchList = peopleList.stream()
+                .filter(person -> person.getPhone().startsWith(phone))
+                .collect(Collectors.toList());
+        showEntries(searchList);
     }
 
     private String readString() {
         return data.hasNext() ? data.next() : null;
     }
 
+    private  boolean listEmpty(){
+        return peopleList.isEmpty() ? true : false;
+
+        }
+/*
+    private  boolean listEmpty(){
+        if(peopleList.isEmpty()) {
+            System.out.println("The list is empty");
+            return true;
+        }
+        else return false;
+    }*/
 }
